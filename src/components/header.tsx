@@ -19,6 +19,7 @@ import {
   LineChartIcon,
 } from "@/components/icons";
 import { UserNav } from "@/components/user-nav";
+import { CompanySwitcher } from "./company-switcher";
 
 export function Header() {
   return (
@@ -85,9 +86,13 @@ export function Header() {
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
           <BreadcrumbItem>
+            <CompanySwitcher />
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="#" prefetch={false}>
-                Dashboard
+                Console
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
