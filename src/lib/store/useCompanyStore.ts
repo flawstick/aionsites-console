@@ -75,7 +75,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     }));
 
     const token: string = localStorage.getItem("jwt") as string;
-    updateCompany(token, company._id, company);
+    updateCompany(token, company._id as string, company);
   },
   setCompanies: (companies: Company[]) => {
     set({ companies });

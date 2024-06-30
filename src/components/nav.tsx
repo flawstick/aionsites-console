@@ -16,6 +16,7 @@ import {
   Package2Icon,
 } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ListChecksIcon, ListIcon, ScrollText, Store } from "lucide-react";
 
 export function Sidebar() {
   return (
@@ -27,61 +28,9 @@ export function Sidebar() {
             className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
             prefetch={false}
           >
-            <Package2Icon className="h-4 w-4 transition-all group-hover:scale-110" />
-            <span className="sr-only">Acme Inc</span>
+            <HomeIcon className="h-5 w-5" />
+            <span className="sr-only">Home</span>
           </Link>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                prefetch={false}
-              >
-                <HomeIcon className="h-5 w-5" />
-                <span className="sr-only">Dashboard</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Dashboard</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                prefetch={false}
-              >
-                <ShoppingCartIcon className="h-5 w-5" />
-                <span className="sr-only">Orders</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Orders</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                prefetch={false}
-              >
-                <PackageIcon className="h-5 w-5" />
-                <span className="sr-only">Products</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Products</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                prefetch={false}
-              >
-                <UsersIcon className="h-5 w-5" />
-                <span className="sr-only">Customers</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Customers</TooltipContent>
-          </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
@@ -94,6 +43,58 @@ export function Sidebar() {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="right">Analytics</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="#"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                prefetch={false}
+              >
+                <ShoppingCartIcon className="h-5 w-5" />
+                <span className="sr-only">Orders</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Orders</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="#"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                prefetch={false}
+              >
+                <UsersIcon className="h-5 w-5" />
+                <span className="sr-only">Users</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Users</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="#"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                prefetch={false}
+              >
+                <Store className="h-5 w-5" />
+                <span className="sr-only">Restaurants</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Restaurants</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="#"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                prefetch={false}
+              >
+                <ScrollText className="h-5 w-5" />
+                <span className="sr-only">Invoices</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Invoices</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </nav>
