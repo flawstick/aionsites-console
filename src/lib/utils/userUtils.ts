@@ -32,6 +32,7 @@ export const createUser = async (jwt: string, userData: any) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwt}`,
+        "x-tenant-id": "agamim",
       },
     },
   );
@@ -67,4 +68,24 @@ export const deleteUser = async (jwt: string, userId: string) => {
     },
   );
   return response.data;
+};
+
+export const changePassword = async (
+  jwt: string,
+  userId: string,
+  data: any,
+  tenantId: string,
+) => {
+  const response = await axios.put(
+    `https://api.aionsites.com/users/${userId}/password`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        "x-tenant-id": tenantId,
+      },
+    },
+  );
+  return response;
 };

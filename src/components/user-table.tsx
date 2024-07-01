@@ -22,20 +22,41 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import {
-  ListFilterIcon,
-  FileIcon,
-  CirclePlusIcon,
-  MoveHorizontalIcon,
-} from "@/components/icons";
+import { ListFilterIcon, FileIcon, CirclePlusIcon } from "@/components/icons";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useUserStore } from "@/lib/store/useUserStore";
 import useAuth from "@/lib/hooks/useAuth";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 import { CreateUser } from "@/components/create-user";
 import { EditUser } from "@/components/edit-user";
+import {
+  KeyRoundIcon,
+  MoreHorizontal,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { ChangePasswordDialog } from "./change-password";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export function UserTable() {
   const { session } = useAuth();
@@ -43,15 +64,24 @@ export function UserTable() {
   const { selectedCompany } = useCompanyStore();
   const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
   const [showEditUserDialog, setShowEditUserDialog] = useState(false);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] =
+    useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [changingPasswordUserId, setChangingPasswordUserId] = useState<
+    string | null
+  >(null);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [selectedDeleteUserId, setSelectedDeleteUserId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (session && selectedCompany)
       fetchUsers(selectedCompany.tenantId as string);
   }, [session, selectedCompany, fetchUsers]);
 
-  const handleDeleteUser = async (userId: string) => {
-    removeUser(userId);
+  const handleDeleteUser = async () => {
+    removeUser(selectedDeleteUserId!);
   };
 
   const handleEditUser = (userId: string) => {
@@ -62,6 +92,11 @@ export function UserTable() {
   const handleCloseEditUserDialog = () => {
     setEditingUserId(null);
     setShowEditUserDialog(false);
+  };
+
+  const handleOpenChangePassword = (userId: string) => {
+    setChangingPasswordUserId(userId);
+    setShowChangePasswordDialog(true);
   };
 
   return (
@@ -129,10 +164,10 @@ export function UserTable() {
                     <TableHead>Name</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Email
+                      Username
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Phone
+                      Worker ID
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
                       Joined
@@ -146,15 +181,13 @@ export function UserTable() {
                   {users.map((user) => (
                     <TableRow key={user._id}>
                       <TableCell className="hidden sm:table-cell">
-                        <img
-                          alt="User image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src={
-                            user.profile?.profilePicture || "/placeholder.svg"
-                          }
-                          width="64"
-                        />
+                        <Avatar>
+                          <AvatarImage
+                            src={user.profile?.profilePicture}
+                            alt={`${user.firstName} ${user.lastName}`}
+                          />
+                          <AvatarFallback>{`${user.firstName[0].toUpperCase()}${user.lastName[0].toUpperCase()}`}</AvatarFallback>
+                        </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">{`${user.firstName} ${user.lastName}`}</TableCell>
                       <TableCell>
@@ -164,34 +197,59 @@ export function UserTable() {
                         {user.username}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {user.profile?.bio || "N/A"}
+                        {user.clockId || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {new Date(user.createdAt).toLocaleString()}
+                        {new Date(user.createdAt as string).toLocaleString()}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoveHorizontalIcon className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent>Actions</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => handleEditUser(user._id!)}
+                              className="flex flex-row items-center justify-start "
                             >
-                              Edit
+                              <PencilIcon className="h-4 w-4" />
+                              <span className="mx-2">Edit</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleDeleteUser(user._id!)}
+                              onClick={() =>
+                                handleOpenChangePassword(user._id!)
+                              }
+                              className="flex flex-row items-center justify-start "
                             >
-                              Delete
+                              <KeyRoundIcon className="h-4 w-4" />
+                              <span className="mx-2">Change Password</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedDeleteUserId(user._id!);
+                                setDeleteAlertOpen(true);
+                              }}
+                              className="flex flex-row items-center justify-start text-red-500"
+                            >
+                              <Trash2Icon className="h-4 w-4" />
+                              <span className="mx-2">Delete</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -210,12 +268,42 @@ export function UserTable() {
       >
         <CreateUser onClose={() => setShowCreateUserDialog(false)} />
       </Dialog>
-      <Dialog open={showEditUserDialog}>
+      <Dialog open={showEditUserDialog} onOpenChange={setShowEditUserDialog}>
         <EditUser
           userId={editingUserId as string}
           onClose={handleCloseEditUserDialog}
         />
       </Dialog>
+      <Dialog
+        open={showChangePasswordDialog}
+        onOpenChange={setShowChangePasswordDialog}
+      >
+        <ChangePasswordDialog
+          userId={changingPasswordUserId!}
+          onClose={() => setShowChangePasswordDialog(false)}
+        />
+      </Dialog>
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              user and remove all of their data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="flex flex-row items-center justify-center"
+              onClick={() => handleDeleteUser()}
+            >
+              <Trash2Icon className="h-4 w-4" />
+              <span className="ml-1">Delete</span>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

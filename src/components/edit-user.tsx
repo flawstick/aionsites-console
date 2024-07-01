@@ -36,8 +36,7 @@ export function EditUser({
   useEffect(() => {
     const fetchAndSetUser = async () => {
       try {
-        const user =
-          users.find((u: any) => u._id === userId) || (await fetchUser(userId));
+        const user = users.find((u: any) => u._id === userId);
         setUsername(user?.username as string);
         setFirstName(user?.firstName as string);
         setLastName(user?.lastName as string);
@@ -51,7 +50,11 @@ export function EditUser({
     };
 
     fetchAndSetUser();
-  }, [userId, users, fetchUser]);
+  }, [userId, onClose]);
+
+  useEffect(() => {
+    setRequestSent(false);
+  }, [onClose]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     setIsLoading(true);
@@ -91,9 +94,13 @@ export function EditUser({
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px] sm:max-h-[600px] overflow-hidden">
+    <DialogContent className="sm:max-w-[600px] sm:max-h-[800px] overflow-auto">
       <DialogHeader>
-        <motion.div variants={animationVariants} transition={{ duration: 0.3 }}>
+        <motion.div
+          className="sticky"
+          variants={animationVariants}
+          transition={{ duration: 0.3 }}
+        >
           <DialogTitle className="text-center">Edit User</DialogTitle>
           <DialogDescription className="text-center">
             Update the user details below.
@@ -179,12 +186,12 @@ export function EditUser({
           </div>
           <div className="flex flex-col w-full space-y-2">
             <Label htmlFor="clockId" className="self-start">
-              Clock ID
+              Worker ID
             </Label>
             <Input
               id="clockId"
               type="number"
-              placeholder="Clock ID"
+              placeholder="Worker ID"
               value={clockId}
               onChange={(e) => setClockId(parseInt(e.target.value))}
               className="w-full"

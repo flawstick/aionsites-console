@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DialogContent,
   DialogHeader,
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { LoadingAnimation } from "./animations";
 import { motion } from "framer-motion";
 import { useUserStore } from "@/lib/store/useUserStore";
-import useAuth from "@/lib/hooks/useAuth";
+import { useCompanyStore } from "@/lib/store/useCompanyStore";
 
 export function CreateUser({ onClose }: { onClose: () => void }) {
   const [username, setUsername] = useState("");
@@ -24,7 +24,7 @@ export function CreateUser({ onClose }: { onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
 
-  const { session }: any = useAuth();
+  const { selectedCompany } = useCompanyStore();
   const { addUser } = useUserStore();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -32,7 +32,7 @@ export function CreateUser({ onClose }: { onClose: () => void }) {
     event.preventDefault();
     try {
       const userData = {
-        tenantId: session.user.tenantId,
+        tenantId: selectedCompany?.tenantId as string,
         username,
         hashedPassword: password,
         firstName,
@@ -47,6 +47,10 @@ export function CreateUser({ onClose }: { onClose: () => void }) {
       console.error("Error registering user:", error);
     }
   };
+
+  useEffect(() => {
+    setRequestSent(false);
+  }, [onClose]);
 
   const animationVariants = {
     initial: { opacity: 0 },
@@ -119,12 +123,12 @@ export function CreateUser({ onClose }: { onClose: () => void }) {
           </div>
           <div className="flex flex-col w-full space-y-2">
             <Label htmlFor="clockId" className="self-start">
-              Clock ID
+              Worker ID
             </Label>
             <Input
               id="clockId"
               type="number"
-              placeholder="Clock ID"
+              placeholder="Worker ID"
               value={clockId}
               onChange={(e) => setClockId(parseInt(e.target.value))}
               className="w-full"

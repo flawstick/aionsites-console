@@ -5,6 +5,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  changePassword,
 } from "@/lib/utils";
 
 interface User {
@@ -39,6 +40,7 @@ interface UserState {
   updateUser: (userId: string, user: User) => void;
   setUsers: (users: User[]) => void;
   removeUser: (userId: string) => void;
+  changePassword: (data: any, userId: string, tenantId: string) => any;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -95,6 +97,15 @@ export const useUserStore = create<UserState>((set, get) => ({
       }));
     } catch (error) {
       console.error("Error deleting user:", error);
+    }
+  },
+  changePassword: async (data: any, userId: string, tenantId: string) => {
+    try {
+      const token: string = localStorage.getItem("jwt") as string;
+      const response = await changePassword(token, userId, data, tenantId);
+      return response.status === 200;
+    } catch (error) {
+      console.error("Error changing password:", error);
     }
   },
 }));
