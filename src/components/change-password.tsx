@@ -67,12 +67,14 @@ export function ChangePasswordDialog({
   }, [onClose, userId]);
 
   const onSubmit = async (data: any) => {
-    const formattedData = {
-      newPassword: data.newPassword,
-      confirmPassword: data.confirmPassword,
-    };
-
-    if (changePassword(formattedData, userId, selectedCompany?.tenantId!))
+    if (
+      changePassword(
+        data.newPassword,
+        data.confirmPassword,
+        userId,
+        selectedCompany?.tenantId!,
+      )
+    )
       onClose();
     else console.error("Error changing password");
   };

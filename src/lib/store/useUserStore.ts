@@ -40,7 +40,12 @@ interface UserState {
   updateUser: (userId: string, user: User) => void;
   setUsers: (users: User[]) => void;
   removeUser: (userId: string) => void;
-  changePassword: (data: any, userId: string, tenantId: string) => any;
+  changePassword: (
+    newPassword: string,
+    confirmPassword: string,
+    userId: string,
+    tenantId: string,
+  ) => any;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -99,10 +104,21 @@ export const useUserStore = create<UserState>((set, get) => ({
       console.error("Error deleting user:", error);
     }
   },
-  changePassword: async (data: any, userId: string, tenantId: string) => {
+  changePassword: async (
+    newPassword: string,
+    confirmPassword: string,
+    userId: string,
+    tenantId: string,
+  ) => {
     try {
       const token: string = localStorage.getItem("jwt") as string;
-      const response = await changePassword(token, userId, data, tenantId);
+      const response = await changePassword(
+        token,
+        userId,
+        newPassword,
+        confirmPassword,
+        tenantId,
+      );
       return response.status === 200;
     } catch (error) {
       console.error("Error changing password:", error);

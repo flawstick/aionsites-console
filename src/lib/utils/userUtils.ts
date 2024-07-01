@@ -73,19 +73,25 @@ export const deleteUser = async (jwt: string, userId: string) => {
 export const changePassword = async (
   jwt: string,
   userId: string,
-  data: any,
+  newPassword: string,
+  confirmPassword: string,
   tenantId: string,
 ) => {
-  const response = await axios.put(
-    `https://api.aionsites.com/users/${userId}/password`,
-    data,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-        "x-tenant-id": tenantId,
+  try {
+    const response = await axios.post(
+      `https://api.aionsites.com/users/change-password`,
+      { userId, newPassword, confirmPassword },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+          "x-tenant-id": tenantId,
+        },
       },
-    },
-  );
-  return response;
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
 };
