@@ -1,4 +1,3 @@
-// /components/ui/Sidebar.tsx
 import {
   TooltipProvider,
   Tooltip,
@@ -127,16 +126,9 @@ export function Sidebar() {
         </TooltipProvider>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-2 px-2 sm:py-5">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8">
-                <ThemeToggle />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right">Theme</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8">
+          <ThemeToggle />
+        </div>
         <span className="sr-only">Toggle theme</span>
         <TooltipProvider>
           <Tooltip>
