@@ -9,14 +9,12 @@ import { GoogleIcon } from "@/components/icons";
 
 export default function LoginPage() {
   return (
-    <div className="grid h-screen w-full grid-cols-1 md:grid-cols-2">
+    <div className="bg-background grid h-screen w-full grid-cols-1 md:grid-cols-2">
       <div className="relative h-full w-full md:block border">
         <img
           src="/aion-background.png"
-          width={1920}
-          height={1080}
           alt="Hero Image"
-          className="h-full w-full object-cover"
+          className="h-full w-full  object-cover"
         />
       </div>
       <div className="flex items-center justify-center py-12">
@@ -56,7 +54,7 @@ export default function LoginPage() {
               <span className="w-full border-t border-gray-300 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-gray-500 dark:bg-gray-950 dark:text-gray-400">
+              <span className="bg-background px-2 text-gray-500 dark:bg-background dark:text-gray-400">
                 Or continue with
               </span>
             </div>

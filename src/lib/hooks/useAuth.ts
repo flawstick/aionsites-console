@@ -9,6 +9,9 @@ const useAuth = () => {
   useEffect(() => {
     if (status === "loading") return; // Do nothing while loading
     if (!session) router.push("/login"); // Redirect to login if not authenticated
+
+    // @ts-ignore
+    if (session?.status === 401) router.push("/login"); // Redirect to login if session is invalid
   }, [session as any, status, router]);
 
   useEffect(() => {

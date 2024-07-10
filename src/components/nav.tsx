@@ -5,18 +5,16 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation"; // Import useRouter hook
+import { usePathname } from "next/navigation";
 import {
   SettingsIcon,
   HomeIcon,
   ShoppingCartIcon,
-  PackageIcon,
   UsersIcon,
   LineChartIcon,
-  Package2Icon,
 } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ListChecksIcon, ListIcon, ScrollText, Store } from "lucide-react";
+import { ScrollText, Store } from "lucide-react";
 
 export function Sidebar() {
   const currentPath = usePathname();
