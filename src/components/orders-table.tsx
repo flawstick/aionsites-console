@@ -39,11 +39,19 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { File, Truck, MoreVertical, Copy, CalendarDays } from "lucide-react";
+import {
+  Truck,
+  MoreVertical,
+  Copy,
+  CalendarDays,
+  FileText,
+  ChevronDown,
+  FileSpreadsheet,
+} from "lucide-react";
 import { RefreshIcon } from "@/components/icons";
 import { OrderListItem } from "@/components/orders-list-item";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
-import { formatDate, exportAsCSV } from "@/lib/utils";
+import { formatDate, exportAsDOCX, exportAsXLSX } from "@/lib/utils";
 import { CalendarDateRangePicker } from "./date-range-picker";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -82,18 +90,35 @@ export function OrdersTable() {
               <TabsTrigger value="live">Live</TabsTrigger>
               <TabsTrigger value="done">Done</TabsTrigger>
             </TabsList>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-2">
               <CalendarDateRangePicker setDate={setDate} date={date} />
-              <Button
-                size="sm"
-                onClick={() =>
-                  exportAsCSV(orders, date?.from as Date, date?.to as Date)
-                }
-                className="h-7 gap-1 text-sm"
-              >
-                <File className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only">Export</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" className="h-7 gap-1 text-sm">
+                    <FileText className="h-3.5 w-3.5" />
+                    <span className="sr-only sm:not-sr-only">Export</span>
+                    <ChevronDown className="h-3.5 w-3.5 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      exportAsXLSX(orders, date?.from as Date, date?.to as Date)
+                    }
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Excel Spreadsheet
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      exportAsDOCX(orders, date?.from as Date, date?.to as Date)
+                    }
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Word Document
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
           <TabsContent value="live">

@@ -1,81 +1,138 @@
 import { Order } from "@/lib/store/useOrderStore";
+import {
+  Document,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  SectionType,
+  WidthType,
+} from "docx";
+import * as XLSX from "xlsx";
 
-const arrayToCSV = (data: any[], headers: string[]) => {
-  const csvRows = [];
-  csvRows.push(headers.join(","));
-
-  for (const row of data) {
-    const values = headers.map((header) => {
-      const value = row[header];
-      return typeof value === "string"
-        ? `"${value.replace(/"/g, '""')}"`
-        : value;
-    });
-    csvRows.push(values.join(","));
-  }
-
-  return csvRows.join("\n");
+// Hebrew headers mapping
+const hebrewHeaders = {
+  "Order ID": "מספר הזמנה",
+  "User Name": "שם משתמש",
+  Items: "פריטים",
+  "Total Price": "מחיר כולל",
+  Status: "סטטוס",
+  "Created At": "נוצר ב",
+  "Updated At": "עודכן ב",
 };
 
-export const exportAsCSV = (
-  orders: Order[],
-  startDate: Date,
-  endDate: Date,
-) => {
-  const headers = [
-    "Order ID",
-    "User Name",
-    "Restaurant Name",
-    "Item Details",
-    "Total Price",
-    "Status",
-    "Created At",
-    "Updated At",
-  ];
-
-  const data = orders
-    .filter((order) => {
-      const orderDate = new Date(order.createdAt);
-      return orderDate >= startDate && orderDate <= endDate;
+// Function to create summarized order details string
+const createSummarizedOrderDetails = (order: Order) => {
+  return order.items
+    .map((item: any) => {
+      const modifiers = Object.entries(item.currentModifiers)
+        .map(([modName, modValue]) => `${modName}: ${modValue}`)
+        .join("; ");
+      return `${item.name} (${item.quantity}) - ${modifiers}`;
     })
-    .map((order) => {
-      const itemDetails = order.items
-        .map((item: any) => {
-          return item.items
-            .map((i: any) => {
-              const modifiers = i.modifiers
-                .map((mod: any) => mod.name)
-                .join(", ");
-              return `${i.name} (Qty: ${i.quantity}, Modifiers: ${modifiers})`;
-            })
-            .join(" | ");
-        })
-        .join(" | ");
+    .join("\n");
+};
 
-      const restaurantNames = order.items
-        .map((item: any) => item.restaurant.name)
-        .join(" | ");
+// Function to filter orders by date range
+const filterOrdersByDate = (orders: Order[], fromDate: Date, toDate: Date) => {
+  return orders.filter((order: Order) => {
+    const orderDate = new Date(order.createdAt);
+    return orderDate >= fromDate && orderDate <= toDate;
+  });
+};
 
-      return {
-        "Order ID": order._id,
-        "User Name": order.user.name,
-        "Restaurant Name": restaurantNames,
-        "Item Details": itemDetails,
-        "Total Price": order.totalPrice,
-        Status: order.status,
-        "Created At": order.createdAt,
-        "Updated At": order.updatedAt,
-      };
+// Function to export as DOCX
+export const exportAsDOCX = (orders: Order[], fromDate: Date, toDate: Date) => {
+  try {
+    const filteredOrders = filterOrdersByDate(orders, fromDate, toDate);
+
+    const table = new Table({
+      rows: [
+        new TableRow({
+          children: Object.values(hebrewHeaders).map(
+            (header) =>
+              new TableCell({
+                children: [new Paragraph(header)],
+                width: { size: 20, type: WidthType.PERCENTAGE },
+              }),
+          ),
+        }),
+        ...filteredOrders.map(
+          (order: Order) =>
+            new TableRow({
+              children: [
+                order._id,
+                order.user.name,
+                createSummarizedOrderDetails(order),
+                order.totalPrice.toString(),
+                order.status,
+                new Date(order.createdAt).toLocaleString("he-IL"),
+                new Date(order.updatedAt).toLocaleString("he-IL"),
+              ].map(
+                (cell) =>
+                  new TableCell({
+                    children: [new Paragraph(cell.toString())],
+                    width: { size: 20, type: WidthType.PERCENTAGE },
+                  }),
+              ),
+            }),
+        ),
+      ],
     });
 
-  const csvContent = arrayToCSV(data, headers);
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+    const doc = new Document({
+      sections: [
+        {
+          properties: { type: SectionType.CONTINUOUS },
+          children: [table],
+        },
+      ],
+    });
 
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", "orders.csv");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    Packer.toBlob(doc).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `הזמנות_${fromDate.toISOString().split("T")[0]}_to_${
+        toDate.toISOString().split("T")[0]
+      }.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  } catch (error) {
+    console.error("Error exporting DOCX:", error);
+  }
+};
+
+// Function to export as XLSX
+export const exportAsXLSX = (orders: Order[], fromDate: Date, toDate: Date) => {
+  const filteredOrders = filterOrdersByDate(orders, fromDate, toDate);
+
+  const worksheet = XLSX.utils.json_to_sheet(
+    filteredOrders.map((order: Order) => ({
+      [hebrewHeaders["Order ID"]]: order._id,
+      [hebrewHeaders["User Name"]]: order.user.name,
+      [hebrewHeaders["Items"]]: createSummarizedOrderDetails(order),
+      [hebrewHeaders["Total Price"]]: order.totalPrice,
+      [hebrewHeaders["Status"]]: order.status,
+      [hebrewHeaders["Created At"]]: new Date(order.createdAt).toLocaleString(
+        "he-IL",
+      ),
+      [hebrewHeaders["Updated At"]]: new Date(order.updatedAt).toLocaleString(
+        "he-IL",
+      ),
+    })),
+  );
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "הזמנות");
+
+  XLSX.writeFile(
+    workbook,
+    `הזמנות_${fromDate.toISOString().split("T")[0]}_to_${
+      toDate.toISOString().split("T")[0]
+    }.xlsx`,
+  );
 };
