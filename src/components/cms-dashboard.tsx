@@ -389,7 +389,7 @@ export function CMSDashboard() {
                       <Label position="center" className="text-xl">
                         {`${orders.length} Orders`}
                       </Label>
-                      {topMealsData.map((entry, index) => (
+                      {topMealsData.map((entry: any, index: number) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
