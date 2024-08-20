@@ -31,6 +31,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import useOrderStore from "@/lib/store/useOrderStore";
 
 const orderData = [
   { date: "2024-04-01", orders: 111 },
@@ -140,7 +141,7 @@ const topMealsData = [
   { name: "Steak", orders: 65 },
 ];
 
-const PRIMARY_COLOR = "346.8 77.2%";
+const PRIMARY_COLOR = "24.6 95%";
 const COLORS = Array.from({ length: 6 }, (_, i) => {
   const brightness = 40 + i * 8; // Brightness levels from 40% to 94%
   return `hsl(${PRIMARY_COLOR} ${brightness}%)`;
@@ -253,8 +254,31 @@ export function CMSDashboard() {
     [],
   );
 
+  const { orders } = useOrderStore();
+  const [topMealsData, setTopMealsData] = React.useState<any>([]);
+
+  React.useEffect(() => {
+    const itemCounts: Record<string, { name: string; orders: number }> = {};
+
+    orders.forEach((order) => {
+      order.items.forEach((item: any) => {
+        item.items.forEach((item: any) => {
+          if (itemCounts[item.name]) {
+            itemCounts[item.name].orders += item.quantity;
+          } else {
+            itemCounts[item.name] = { name: item.name, orders: item.quantity };
+          }
+        });
+      });
+    });
+
+    const curatedData = Object.values(itemCounts);
+    curatedData.sort((a, b) => b.orders - a.orders);
+    setTopMealsData(curatedData);
+  }, [orders]);
+
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex h-full w-full flex-col">
       <div className="grid flex-1 items-start gap-5 p-2 sm:px-3 sm:py-0 md:gap-4">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Card className="sm:col-span-2">
@@ -305,32 +329,39 @@ export function CMSDashboard() {
           </Card>
           <Card className="sm:col-span-1">
             <CardHeader className="top-0">
-              <CardTitle className="text-sm">Today's Orders</CardTitle>
+              <CardTitle className="text-sm">Latest's Orders</CardTitle>
               <CardDescription className="text-xs">
-                The total number of orders placed today.
+                Check out the latest orders from your customers.
               </CardDescription>
             </CardHeader>
             <CardContent className="max-h-64 overflow-auto">
-              <div className="flex flex-col items-center justify-center gap-2 py-2">
-                <div className="text-2xl font-bold">142</div>
-                <OrderItem
-                  imgSrc="/placeholder.svg"
-                  imgAlt="Burger"
-                  title="Gourmet Burger"
-                  description="Beef patty, cheese, lettuce, tomato"
-                />
-                <OrderItem
-                  imgSrc="/placeholder.svg"
-                  imgAlt="Pizza"
-                  title="Pepperoni Pizza"
-                  description="Tomato sauce, mozzarella, pepperoni"
-                />
-                <OrderItem
-                  imgSrc="/placeholder.svg"
-                  imgAlt="Salad"
-                  title="Caesar Salad"
-                  description="Romaine, croutons, parmesan, caesar dressing"
-                />
+              <div
+                className="flex flex-col items-center justify-center gap-2 py-2"
+                dir="rtl"
+              >
+                {orders.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {orders.map((order) =>
+                      order.items.map((restaurantItem: any) =>
+                        restaurantItem.items.map((item: any, index: number) => (
+                          <OrderItem
+                            key={index}
+                            imgSrc={item.imageUrl || "/placeholder.svg"}
+                            imgAlt={item.name}
+                            title={`${item.name} - ${order.user.name}`}
+                            description={
+                              item.description || "No description available"
+                            }
+                          />
+                        )),
+                      ),
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center text-sm text-muted-foreground">
+                    No orders placed today.
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -342,7 +373,7 @@ export function CMSDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={320}>
                 <ChartContainer config={chartConfig}>
                   <PieChart>
                     <Pie
@@ -355,8 +386,8 @@ export function CMSDashboard() {
                       innerRadius={120}
                       label
                     >
-                      <Label position="center" className={`text-xl`}>
-                        {`Best Sellers!`}
+                      <Label position="center" className="text-xl">
+                        {`${orders.length} Orders`}
                       </Label>
                       {topMealsData.map((entry, index) => (
                         <Cell
@@ -366,13 +397,20 @@ export function CMSDashboard() {
                       ))}
                     </Pie>
                     <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          labelKey="name"
-                          nameKey="orders"
-                          indicator="dot"
-                        />
-                      }
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="flex flex-row items-center justify-between bg-background rounded-lg p-2 border-[1px] gap-1">
+                              <div
+                                className="h-3 w-3 rounded"
+                                style={{ background: payload[0].payload.fill }}
+                              />
+                              <p className="-mt-[2px]">{`${payload[0].name}`}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
                     />
                   </PieChart>
                 </ChartContainer>

@@ -28,8 +28,8 @@ export function Sidebar() {
             href="/"
             className={`group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold md:h-8 md:w-8 md:text-base ${
               isActive("/")
-                ? "bg-primary text-accent-foreground"
-                : "bg-primary text-primary-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "bg-primary opacity-80 hover:opacity-100 transform transition-all duration-200 text-primary-foreground"
             }`}
             prefetch={false}
           >
