@@ -52,7 +52,7 @@ import { RefreshIcon } from "@/components/icons";
 import { OrderListItem } from "@/components/orders-list-item";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 import { formatDate, exportAsDOCX, exportAsXLSX } from "@/lib/utils";
-import { CalendarDateRangePicker } from "./date-range-picker";
+import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { addDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 

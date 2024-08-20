@@ -26,10 +26,14 @@ const hebrewHeaders = {
 const createSummarizedOrderDetails = (order: Order) => {
   return order.items
     .map((item: any) => {
-      const modifiers = Object.entries(item.currentModifiers)
-        .map(([modName, modValue]) => `${modName}: ${modValue}`)
-        .join("; ");
-      return `${item.name} (${item.quantity}) - ${modifiers}`;
+      item.items.map((item: any) => {
+        if (item.currentModifiers === undefined)
+          return `${item.name} (${item.quantity})`;
+        const modifiers = Object.entries(item.currentModifiers)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("; ");
+        return `${item.name} (${item.quantity}) - ${modifiers}`;
+      });
     })
     .join("\n");
 };
