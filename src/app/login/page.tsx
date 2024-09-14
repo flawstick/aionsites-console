@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { GoogleIcon } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LoginPage() {
   return (
@@ -21,6 +22,11 @@ export default function LoginPage() {
         <div className="absolute top-0 right-0 flex flex-col items-center justify-center space-y-6 px-8 text-center">
           <div className="absolute top-4 right-4">
             <Button variant="ghost">Sign Up</Button>
+          </div>
+        </div>
+        <div className="absolute bottom-0 right-0 flex flex-col items-center justify-center space-y-6 px-8 text-center">
+          <div className="absolute bottom-4 right-4">
+            <ThemeToggle />
           </div>
         </div>
         <div className="w-full max-w-md space-y-6 px-4 sm:px-6 lg:px-8">

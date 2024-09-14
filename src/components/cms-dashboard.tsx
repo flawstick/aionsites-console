@@ -16,6 +16,7 @@ import {
   Text,
   Label,
   LabelList,
+  Dot,
 } from "recharts";
 import {
   Card,
@@ -262,7 +263,7 @@ export function CMSDashboard() {
 
     orders.forEach((order) => {
       order.items.forEach((item: any) => {
-        item.items.forEach((item: any) => {
+        item.items?.forEach((item: any) => {
           if (itemCounts[item.name]) {
             itemCounts[item.name].orders += item.quantity;
           } else {
@@ -320,6 +321,9 @@ export function CMSDashboard() {
                     <Line
                       type="monotone"
                       dataKey="spendings"
+                      dot={(props) => (
+                        <Dot {...props} fill="hsl(var(--primary))" />
+                      )}
                       stroke="hsl(var(--primary))"
                     />
                   </LineChart>
@@ -342,18 +346,21 @@ export function CMSDashboard() {
                 {orders.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {orders.map((order) =>
-                      order.items.map((restaurantItem: any) =>
-                        restaurantItem.items.map((item: any, index: number) => (
-                          <OrderItem
-                            key={index}
-                            imgSrc={item.imageUrl || "/placeholder.svg"}
-                            imgAlt={item.name}
-                            title={`${item.name} - ${order.user.name}`}
-                            description={
-                              item.description || "No description available"
-                            }
-                          />
-                        )),
+                      order.items.map(
+                        (restaurantItem: any) =>
+                          restaurantItem?.items?.map(
+                            (item: any, index: number) => (
+                              <OrderItem
+                                key={index}
+                                imgSrc={item.imageUrl || "/placeholder.svg"}
+                                imgAlt={item.name}
+                                title={`${item.name} - ${order.user.name}`}
+                                description={
+                                  item.description || "No description available"
+                                }
+                              />
+                            ),
+                          ),
                       ),
                     )}
                   </div>

@@ -353,7 +353,7 @@ const OrderCard: React.FC<{ hoveredOrder: any }> = ({ hoveredOrder }) => {
                 <span className="flex flex-row items-center justify-center">
                   <img
                     src={item?.items[0]?.imageUrl}
-                    alt={item.items[0].name}
+                    alt={item.items[0]?.name}
                     className="w-12 h-12 rounded-sm mx-2"
                   />
                   {item.restaurant.name} - {item.items[0].name} x{" "}
