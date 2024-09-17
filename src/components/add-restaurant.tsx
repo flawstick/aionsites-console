@@ -65,22 +65,36 @@ export function AddRestaurantButton() {
   const [showMenu, setShowMenu] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean | null>(false);
 
-  const { nearbyRestaurants, fetchNearbyRestaurants, addCompanyRestaurant } =
-    useRestaurantStore();
+  const {
+    companyRestaurants,
+    nearbyRestaurants,
+    fetchNearbyRestaurants,
+    addCompanyRestaurant,
+  } = useRestaurantStore();
 
   useEffect(() => {
     (async () => {
       if (isOpen) {
         setLoading(true);
         await fetchNearbyRestaurants();
+        setAddedRestaurants(companyRestaurants.map((r) => r._id.toString()));
         setLoading(false);
+      } else {
+        filteredNearbyRestaurants = [];
       }
     })();
   }, [isOpen]);
 
+  useEffect(() => {
+    setAddedRestaurants(companyRestaurants.map((r) => r._id.toString()));
+    filteredNearbyRestaurants = nearbyRestaurants.filter(
+      (restaurant) => !addedRestaurants.includes(restaurant._id.toString()),
+    );
+  }, [companyRestaurants]);
+
   const handleAddRestaurant = (restaurant: any) => {
-    if (!addedRestaurants.includes(restaurant._id)) {
-      setAddedRestaurants([...addedRestaurants, restaurant._id]);
+    if (!addedRestaurants.includes(restaurant._id.toString())) {
+      setAddedRestaurants([...addedRestaurants, restaurant._id.toString()]);
       addCompanyRestaurant(restaurant);
     }
   };
@@ -92,6 +106,11 @@ export function AddRestaurantButton() {
   const handleConfirmAddRestaurant = (restaurant: any) => {
     handleAddRestaurant(restaurant);
   };
+
+  // Filter out the company restaurants from nearby restaurants
+  let filteredNearbyRestaurants = nearbyRestaurants.filter(
+    (restaurant) => !addedRestaurants.includes(restaurant._id.toString()),
+  );
 
   // Animation variants for Framer Motion
   const cardVariants = {
@@ -126,7 +145,7 @@ export function AddRestaurantButton() {
         </DialogHeader>
         <ScrollArea className="h-[70vh] pr-4">
           <div className="space-y-4 mb-2">
-            {nearbyRestaurants.map((restaurant) => (
+            {filteredNearbyRestaurants.map((restaurant) => (
               <motion.div
                 key={restaurant._id}
                 initial="hidden"

@@ -3,6 +3,7 @@ import {
   getCompanyRestaurants,
   getNearbyRestaurants,
   addRestaurantToCompany,
+  RemoveRestaurantFromCompany,
 } from "@/lib/utils";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 
@@ -30,6 +31,7 @@ interface RestaurantState {
   fetchNearbyRestaurants: () => Promise<void>;
   setCompanyRestaurants: (restaurants: Restaurant[]) => void;
   addCompanyRestaurant: (restaurant: Restaurant) => void;
+  removeCompanyRestaurant: (restaurant: Restaurant) => void;
   setNearbyRestaurants: (restaurants: Restaurant[]) => void;
   setSelectedRestaurant: (restaurant: Restaurant | null) => void;
 }
@@ -84,6 +86,24 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
 
     set((state) => ({
       companyRestaurants: [...state.companyRestaurants, restaurant],
+    }));
+  },
+  removeCompanyRestaurant: async (restaurant: Restaurant) => {
+    const response = await RemoveRestaurantFromCompany(
+      localStorage.getItem("jwt") as string,
+      useCompanyStore.getState().selectedCompany?._id as string,
+      restaurant._id as string,
+    );
+
+    if (!response) {
+      console.error("Error removing restaurant from company");
+      return;
+    }
+
+    set((state) => ({
+      companyRestaurants: state.companyRestaurants.filter(
+        (r) => r._id !== restaurant._id,
+      ),
     }));
   },
   setNearbyRestaurants: (restaurants: Restaurant[]) => {

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -47,12 +46,26 @@ import { motion } from "framer-motion";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { AddRestaurantButton } from "./add-restaurant";
-import { useRestaurantStore } from "@/lib/store/useRestaurantStore"; // Assuming the store is placed here
+import { useRestaurantStore } from "@/lib/store/useRestaurantStore";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 
 export function RestaurantTable() {
-  const { companyRestaurants, fetchCompanyRestaurants, setCompanyRestaurants } =
-    useRestaurantStore();
+  const {
+    companyRestaurants,
+    fetchCompanyRestaurants,
+    setCompanyRestaurants,
+    removeCompanyRestaurant,
+  } = useRestaurantStore();
   const { selectedCompany } = useCompanyStore();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,12 +79,12 @@ export function RestaurantTable() {
     fetchCompanyRestaurants();
   }, [selectedCompany]);
 
-  const handleDelete = (restaurantId: string) => {
-    console.log(`Deleting restaurant with ID ${restaurantId}`);
-  };
-
   const handleViewMenu = (name: string) => {
     console.log(`Viewing menu for ${name}`);
+  };
+
+  const handleDelete = (restaurant: any) => {
+    removeCompanyRestaurant(restaurant);
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -360,31 +373,56 @@ export function RestaurantTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">
-                            Open menu for {restaurant.name}
-                          </span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onSelect={() => handleViewMenu(restaurant.name)}
-                        >
-                          <Menu className="mr-2 h-4 w-4" />
-                          <span>View Menu</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() => handleDelete(restaurant._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          <span>Delete</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <AlertDialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">
+                              Open menu for {restaurant.name}
+                            </span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onSelect={() => handleViewMenu(restaurant.name)}
+                          >
+                            <Menu className="mr-2 h-4 w-4" />
+                            <span>View Menu</span>
+                          </DropdownMenuItem>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Remove</span>
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>Remove restaurant</AlertDialogHeader>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this restaurant? Your
+                          employees will no longer be able to order from this
+                          restaurant.
+                        </AlertDialogDescription>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel asChild>
+                            <Button variant="ghost">Cancel</Button>
+                          </AlertDialogCancel>
+                          <AlertDialogAction asChild>
+                            <Button
+                              variant="destructive"
+                              onClick={() => {
+                                console.log("restaurant", restaurant);
+                                handleDelete(restaurant);
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </motion.tr>
               ))}

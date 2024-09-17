@@ -142,3 +142,28 @@ export const addRestaurantToCompany = async (
     throw error;
   }
 };
+
+export const RemoveRestaurantFromCompany = async (
+  token: string,
+  companyId: string,
+  restaurantId: string,
+) => {
+  try {
+    const response = await axios.delete(
+      `https://api.aionsites.com/companies/${companyId}/restaurants/${restaurantId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error removing restaurant ${restaurantId} from company ${companyId}:`,
+      error,
+    );
+    throw error;
+  }
+};
