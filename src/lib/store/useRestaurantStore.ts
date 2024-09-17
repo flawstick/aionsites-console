@@ -1,18 +1,25 @@
 import { create } from "zustand";
-import { getCompanyRestaurants, getNearbyRestaurants } from "@/lib/utils";
+import {
+  getCompanyRestaurants,
+  getNearbyRestaurants,
+  addRestaurantToCompany,
+} from "@/lib/utils";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 
-interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
 interface Restaurant {
-  profile: string;
-  rating: string;
+  _id: string;
+  name: string;
+  profile?: {
+    picture?: string;
+    banner?: string;
+    name?: string;
+  };
+  rating: number;
   category: string;
+  cuisine: string;
   address: string;
-  coordinates: Coordinates;
+  location: any;
+  distance: string;
 }
 
 interface RestaurantState {
@@ -22,6 +29,7 @@ interface RestaurantState {
   fetchCompanyRestaurants: () => Promise<void>;
   fetchNearbyRestaurants: () => Promise<void>;
   setCompanyRestaurants: (restaurants: Restaurant[]) => void;
+  addCompanyRestaurant: (restaurant: Restaurant) => void;
   setNearbyRestaurants: (restaurants: Restaurant[]) => void;
   setSelectedRestaurant: (restaurant: Restaurant | null) => void;
 }
@@ -40,6 +48,7 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
         selectedCompany._id as string,
       );
       set({ companyRestaurants: restaurants });
+      console.log("companyRestaurants", restaurants);
     } catch (error) {
       console.error("Error fetching company restaurants:", error);
     }
@@ -60,6 +69,22 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
   },
   setCompanyRestaurants: (restaurants: Restaurant[]) => {
     set({ companyRestaurants: restaurants });
+  },
+  addCompanyRestaurant: async (restaurant: Restaurant) => {
+    const response = await addRestaurantToCompany(
+      localStorage.getItem("jwt") as string,
+      useCompanyStore.getState().selectedCompany?._id as string,
+      restaurant._id as string,
+    );
+
+    if (!response) {
+      console.error("Error adding restaurant to company");
+      return;
+    }
+
+    set((state) => ({
+      companyRestaurants: [...state.companyRestaurants, restaurant],
+    }));
   },
   setNearbyRestaurants: (restaurants: Restaurant[]) => {
     set({ nearbyRestaurants: restaurants });

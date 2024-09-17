@@ -116,3 +116,29 @@ export const getNearbyRestaurants = async (
     throw error;
   }
 };
+
+export const addRestaurantToCompany = async (
+  token: string,
+  companyId: string,
+  restaurantId: string,
+) => {
+  try {
+    const response = await axios.post(
+      `https://api.aionsites.com/companies/${companyId}/restaurants`,
+      { restaurantId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error adding restaurant ${restaurantId} to company ${companyId}:`,
+      error,
+    );
+    throw error;
+  }
+};

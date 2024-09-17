@@ -39,7 +39,6 @@ import {
   Trash2,
   Filter,
   Search,
-  Plus,
   SortAsc,
   Check,
   X,
@@ -49,14 +48,12 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { AddRestaurantButton } from "./add-restaurant";
 import { useRestaurantStore } from "@/lib/store/useRestaurantStore"; // Assuming the store is placed here
+import { useCompanyStore } from "@/lib/store/useCompanyStore";
 
 export function RestaurantTable() {
-  const {
-    companyRestaurants,
-    fetchCompanyRestaurants,
-    setCompanyRestaurants,
-    removeRestaurant,
-  } = useRestaurantStore();
+  const { companyRestaurants, fetchCompanyRestaurants, setCompanyRestaurants } =
+    useRestaurantStore();
+  const { selectedCompany } = useCompanyStore();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,11 +63,11 @@ export function RestaurantTable() {
   const restaurantsPerPage = 15;
 
   useEffect(() => {
-    fetchCompanyRestaurants("companyId"); // Pass the correct company ID
-  }, []);
+    fetchCompanyRestaurants();
+  }, [selectedCompany]);
 
-  const handleDelete = (id: number) => {
-    removeRestaurant(id); // Assume removeRestaurant is implemented in the Zustand store
+  const handleDelete = (restaurantId: string) => {
+    console.log(`Deleting restaurant with ID ${restaurantId}`);
   };
 
   const handleViewMenu = (name: string) => {
@@ -85,7 +82,7 @@ export function RestaurantTable() {
   const handleFilter = (cuisine: string) => {
     if (activeFilter === cuisine) {
       setActiveFilter(null);
-      fetchCompanyRestaurants("companyId"); // Reset to original state
+      fetchCompanyRestaurants(); // Reset to original state
     } else {
       setActiveFilter(cuisine);
       setCompanyRestaurants(
@@ -99,7 +96,7 @@ export function RestaurantTable() {
 
   const handleRemoveFilter = () => {
     setActiveFilter(null);
-    fetchCompanyRestaurants("companyId"); // Reset to original state
+    fetchCompanyRestaurants(); // Reset to original state
     setCurrentPage(1);
   };
 
@@ -113,7 +110,7 @@ export function RestaurantTable() {
       (restaurant) =>
         restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.location.toLowerCase().includes(searchTerm.toLowerCase()),
+        restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     .sort((a, b) => {
       if (sortBy === "name") {
@@ -284,7 +281,7 @@ export function RestaurantTable() {
             <TableBody>
               {currentRestaurants.map((restaurant) => (
                 <motion.tr
-                  key={restaurant.id}
+                  key={restaurant._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
@@ -292,48 +289,48 @@ export function RestaurantTable() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className=" ml-2 bg-foreground">
-                        <Image
-                          src={restaurant.image}
-                          alt={restaurant.name}
+                        <img
+                          src={restaurant?.profile?.picture as string}
+                          alt={restaurant?.name}
                           width={40}
                           height={40}
                           className="rounded-lg"
                         />
                       </Avatar>
-                      <span className="font-medium">{restaurant.name}</span>
+                      <span className="font-medium">{restaurant?.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{restaurant.cuisine}</TableCell>
+                  <TableCell>{restaurant?.cuisine}</TableCell>
                   <TableCell>
                     <HoverCard>
                       <HoverCardTrigger asChild>
                         <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`}
+                          href={`https://www.google.com/maps/search/?api=1&query=${restaurant.location.coordinates[0]},${restaurant.location.coordinates[1]}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline inline-flex items-center"
                         >
                           <MapPin className="w-4 h-4 mr-1" />
-                          {restaurant.location.length > 20
-                            ? `${restaurant.location.substring(0, 20)}...`
-                            : restaurant.location}
+                          {restaurant.address.length > 20
+                            ? `${restaurant.address.substring(0, 20)}...`
+                            : restaurant.address}
                         </a>
                       </HoverCardTrigger>
                       <HoverCardContent className="w-80">
                         <div className="space-y-2">
                           <h4 className="text-sm font-semibold">
-                            {restaurant.name}
+                            {restaurant?.name}
                           </h4>
-                          <p className="text-sm">{restaurant.location}</p>
+                          <p className="text-sm">{restaurant.address}</p>
                           <div className="flex items-center space-x-2 text-sm">
                             <span className="font-semibold">Coordinates:</span>
                             <span className="bg-primary/10 px-2 py-1 rounded-md">
-                              {restaurant.latitude.toFixed(4)},{" "}
-                              {restaurant.longitude.toFixed(4)}
+                              {restaurant.location.coordinates[0].toFixed(4)},{" "}
+                              {restaurant.location.coordinates[1].toFixed(4)}
                             </span>
                           </div>
                           <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${restaurant.latitude},${restaurant.longitude}`}
+                            href={`https://www.google.com/maps/search/?api=1&query=${restaurant.location.coordinates[0]},${restaurant.location.coordinates[1]}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-primary hover:underline inline-flex items-center"
@@ -351,14 +348,14 @@ export function RestaurantTable() {
                         <Star
                           key={i}
                           className={`w-4 h-4 ${
-                            i < Math.floor(restaurant.rating)
+                            i < Math.floor(restaurant?.rating)
                               ? "text-yellow-400 fill-current"
                               : "text-gray-300"
                           }`}
                         />
                       ))}
                       <span className="ml-2 text-sm text-gray-600">
-                        {restaurant.rating.toFixed(1)}
+                        {restaurant?.rating.toFixed(1)}
                       </span>
                     </div>
                   </TableCell>
@@ -380,7 +377,7 @@ export function RestaurantTable() {
                           <span>View Menu</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onSelect={() => handleDelete(restaurant.id)}
+                          onSelect={() => handleDelete(restaurant._id)}
                           className="text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
