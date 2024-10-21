@@ -7,20 +7,22 @@ import {
   deleteCompany,
 } from "@/lib/utils";
 
-interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
 interface Company {
   _id?: string;
   name: string;
-  contactEmail: string;
-  contactPhone: string;
+  profile: { url: string; logo: string };
   address?: string;
-  coordinates?: Coordinates;
+  contactEmail?: string;
+  contactPhone?: string;
   tenantId: string;
   restaurants: string[];
+  members?: string[];
+  coordinates?: { lat: number; lng: number };
+  maxOrdersPerDay?: number;
+  maxOrdersPerMonth?: number;
+  maxPerOrder?: number;
+  maxOrderShekels?: number;
+  companyContributionPercentage?: number;
 }
 
 interface CompanyState {

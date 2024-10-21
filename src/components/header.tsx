@@ -26,9 +26,10 @@ import { CompanySwitcher } from "./company-switcher";
 
 interface HeaderProps {
   paths: { name: string; href: string; current: boolean }[];
+  fullWidth?: boolean;
 }
 
-export function Header({ paths }: HeaderProps) {
+export function Header({ paths, fullWidth }: HeaderProps) {
   const ref = useRef<HTMLElement>(null);
   const [isIntersecting, setIntersecting] = useState(true);
 
@@ -46,7 +47,7 @@ export function Header({ paths }: HeaderProps) {
     <>
       <header ref={ref}>
         <div
-          className={`fixed w-screen md:w-[97%] top-0 pt-3 pb-2 z-30 flex h-14 items-center gap-4 px-4 sm:h-auto sm:border-0 sm:bg-transparent backdrop-blur sm:px-6
+          className={`fixed w-screen ${fullWidth ? null :  "md:w-[97%]"} top-0 pt-3 pb-2 z-30 flex h-14 items-center gap-4 px-4 sm:h-auto sm:border-0 sm:bg-transparent backdrop-blur sm:px-6
             ${isIntersecting ? "md:border-none" : "md:border-b"}
         `}
         >
