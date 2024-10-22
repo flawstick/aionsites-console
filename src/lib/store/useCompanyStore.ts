@@ -10,7 +10,7 @@ import {
 interface Company {
   _id?: string;
   name: string;
-  profile: { url: string; logo: string };
+  profile?: { url: string; logo: string };
   address?: string;
   contactEmail?: string;
   contactPhone?: string;

@@ -12,7 +12,6 @@ import AuthProvider from "@/components/auth-provider";
 import { usePathname, useRouter } from "next/navigation";
 import { useSettings } from "@/lib/hooks/useSettings";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
-import { profile } from "console";
 
 export default function WrappedPage() {
   return (
@@ -22,7 +21,7 @@ export default function WrappedPage() {
   );
 }
 
-export function CompanySettingsPage() {
+function CompanySettingsPage() {
   const { updateSettings, loading, error } = useSettings();
   const { selectedCompany } = useCompanyStore();
 
@@ -104,7 +103,7 @@ export function CompanySettingsPage() {
       maxOrdersPerDay,
       maxOrdersPerMonth,
       companyContributionPercentage,
-    } satisfies any;
+    };
     updateSettings(selectedCompany?._id as string, dataToSend as any);
     setHasChanges(false);
   };
