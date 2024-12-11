@@ -23,17 +23,10 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body
-        className={cn("min-h-screen font-sans antialiased ", fontSans.variable)}
-      >
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-          </ThemeProvider>
-        </AuthProvider>
-      </body>
-    </html>
+    <body
+      className={cn("min-h-screen font-sans antialiased ", fontSans.variable)}
+    >
+      <LayoutSidebar>{children}</LayoutSidebar>
+    </body>
   );
 }
