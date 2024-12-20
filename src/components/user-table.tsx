@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
@@ -57,11 +57,21 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export function UserTable() {
   const { session } = useAuth();
   const { users, fetchUsers, removeUser } = useUserStore();
   const { selectedCompany } = useCompanyStore();
+
   const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
   const [showEditUserDialog, setShowEditUserDialog] = useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] =
@@ -75,10 +85,31 @@ export function UserTable() {
     string | null
   >(null);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
-    if (session && selectedCompany)
+    if (session && selectedCompany) {
       fetchUsers(selectedCompany.tenantId as string);
+    }
   }, [session, selectedCompany, fetchUsers]);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+      return (
+        fullName.includes(searchQuery.toLowerCase()) ||
+        user.username?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
+  }, [users, searchQuery]);
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const currentUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredUsers, currentPage, itemsPerPage]);
 
   const handleDeleteUser = async () => {
     removeUser(selectedDeleteUserId!);
@@ -99,6 +130,10 @@ export function UserTable() {
     setShowChangePasswordDialog(true);
   };
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <>
       <Tabs defaultValue="all">
@@ -112,6 +147,15 @@ export function UserTable() {
             </TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
+            <Input
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // reset to first page when searching
+              }}
+              className="h-8 w-40"
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
@@ -178,7 +222,7 @@ export function UserTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user) => (
+                  {currentUsers.map((user) => (
                     <TableRow key={user._id}>
                       <TableCell className="hidden sm:table-cell">
                         <Avatar>
@@ -256,8 +300,56 @@ export function UserTable() {
                       </TableCell>
                     </TableRow>
                   ))}
+                  {currentUsers.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4">
+                        No users found.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
+              {filteredUsers.length > itemsPerPage && (
+                <div className="mt-4 flex justify-end">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        />
+                      </PaginationItem>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (pageNumber) => (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink
+                              href="#"
+                              onClick={() => handlePageChange(pageNumber)}
+                              isActive={pageNumber === currentPage}
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ),
+                      )}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages),
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

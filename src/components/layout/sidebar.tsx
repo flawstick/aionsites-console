@@ -32,21 +32,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -59,16 +44,24 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import { CompanySwitcher } from "../company-switcher";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "../theme-toggle";
 
 const data = {
   user: {
@@ -96,7 +89,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/",
+      url: "",
       icon: LayoutDashboard,
       items: [],
     },
@@ -132,8 +125,8 @@ const data = {
       items: [],
     },
     {
-      title: "Invoices",
-      url: "/invoices",
+      title: "Payroll & Invoices",
+      url: "/payments",
       icon: FileText,
       items: [],
     },
@@ -147,12 +140,13 @@ const data = {
 };
 
 export function LayoutSidebar({ children }: { children: React.ReactNode }) {
-  const [activeTeam, setActiveTeam] = React.useState(data.teams[0]);
   const { team } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   const headerRef = React.useRef<HTMLDivElement | null>(null);
   const [isIntersecting, setIsIntersecting] = React.useState(false);
+
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -180,25 +174,46 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
           <SidebarGroup>
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-              {data.navMain.map((item) => (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    onClick={() => {
-                      router.push(`/${team}/${item.url}`);
-                    }}
-                  >
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {data.navMain.map((item, index) => {
+                const routePath = `/${team}${item.url}`;
+                let isActive = pathname.startsWith(routePath);
+                if (item.title === "Dashboard") {
+                  if (pathname === `/${team}`) {
+                    isActive = true;
+                  } else {
+                    isActive = false;
+                  }
+                }
+
+                return (
+                  <SidebarMenuItem key={index}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      onClick={() => {
+                        router.push(routePath);
+                      }}
+                      className={cn(
+                        "transition-colors duration-200",
+                        isActive &&
+                          "bg-primary text-primary-foreground rounded-md hover:bg-primary/90 hover:text-white",
+                      )}
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <ThemeToggle className="w-10 h-10" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -286,10 +301,10 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <div ref={headerRef} className="flex">
+        <div ref={headerRef} className="flex ">
           <header
             className={cn(
-              "fixed w-full flex shrink-0 items-center gap-2 border-b px-4 transition-all duration-400",
+              "fixed w-full flex shrink-0 items-center gap-2 border-b px-4 transition-all duration-400 z-50",
               isIntersecting
                 ? "bg-sidebar"
                 : "bg-background border-transparent",

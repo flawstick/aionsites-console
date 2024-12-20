@@ -3,9 +3,7 @@ import "@/styles/globals.css";
 
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider";
 import { LayoutSidebar } from "@/components/layout/sidebar";
-import AuthProvider from "@/components/auth-provider";
 
 export const metadata: Metadata = {
   description: "A console for companies to manage their grub experience.",

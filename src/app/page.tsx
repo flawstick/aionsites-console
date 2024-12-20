@@ -7,8 +7,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { GoogleIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useCompanyStore } from "@/lib/store/useCompanyStore";
+import { useCallback, useEffect } from "react";
 
 export default function LoginPage() {
+  const { fetchCompanies } = useCompanyStore();
+  const redirect = useCallback(() => {
+    fetchCompanies();
+  }, []);
+
+  useEffect(() => {
+    redirect();
+  }, []);
   return (
     <div className="bg-background grid h-screen w-full grid-cols-1 md:grid-cols-2">
       <div className="relative h-full w-full md:block border">

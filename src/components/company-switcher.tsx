@@ -56,7 +56,6 @@ export function CompanySwitcher({ className }: CompanySwitcherProps) {
         <DropdownMenuTrigger asChild>
           <SidebarMenuButton
             size="lg"
-            role="combobox"
             aria-expanded={open}
             aria-label="Select a team"
             className={cn(
@@ -64,12 +63,11 @@ export function CompanySwitcher({ className }: CompanySwitcherProps) {
               className,
             )}
           >
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-black border text-sidebar-primary-foreground">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-white dark:bg-black border text-sidebar-primary-foreground">
               <Avatar className="h-5 w-5">
                 <AvatarImage
-                  src={`https://avatar.vercel.sh/${selectedCompany?.name}.png`}
+                  src={selectedCompany?.profile?.logo}
                   alt={selectedCompany?.name || "Company"}
-                  className="grayscale"
                 />
                 <AvatarFallback>SC</AvatarFallback>
               </Avatar>
