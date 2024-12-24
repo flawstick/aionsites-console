@@ -28,7 +28,7 @@ interface Company {
 interface CompanyState {
   companies: Company[];
   selectedCompany: Company | null;
-  fetchCompanies: () => Promise<void>;
+  fetchCompanies: () => Promise<any>;
   fetchCompany: (companyId: string) => Promise<void>;
   addCompany: (company: Company) => void;
   updateCompany: (company: Company) => void;
@@ -48,6 +48,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       if (companies.length > 0 && !get().selectedCompany) {
         set({ selectedCompany: companies[0] });
       }
+      return companies;
     } catch (error) {
       console.error("Error fetching companies:", error);
     }

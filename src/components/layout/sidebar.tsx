@@ -13,6 +13,7 @@ import {
   LogOut,
   Plus,
   Sparkles,
+  Store,
 } from "lucide-react";
 import {
   LayoutDashboard,
@@ -131,6 +132,12 @@ const data = {
       items: [],
     },
     {
+      title: "Restaurants",
+      url: "/restaurants",
+      icon: Store,
+      items: [],
+    },
+    {
       title: "Settings",
       url: "/settings",
       icon: Settings,
@@ -159,6 +166,27 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
     }
     return () => observer.disconnect();
   }, []);
+
+  const [breadcrumbs, setBreadcrumbs] = React.useState<
+    { title: string; url: string }[]
+  >([]);
+  React.useEffect(() => {
+    // Regex split and capitalize
+    const parts = pathname.split("/").filter(Boolean);
+    const newBreadcrumbs = parts.map((part, index) => {
+      if (index === 0) {
+        return {
+          title: "Dashboard",
+          url: `/${team}`,
+        };
+      }
+      return {
+        title: part.charAt(0).toUpperCase() + part.slice(1),
+        url: `/${parts.slice(0, index + 1).join("/")}`,
+      };
+    });
+    setBreadcrumbs(newBreadcrumbs);
+  }, [pathname]);
 
   return (
     <SidebarProvider>
@@ -315,15 +343,18 @@ export function LayoutSidebar({ children }: { children: React.ReactNode }) {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadcrumbs.map((breadcrumb, index) => (
+                  <BreadcrumbItem key={index}>
+                    <BreadcrumbLink href={breadcrumb.url}>
+                      {breadcrumb.title}
+                    </BreadcrumbLink>
+                    {index < breadcrumbs.length - 1 && (
+                      <BreadcrumbSeparator>
+                        <ChevronRight className="w-3 h-3" />
+                      </BreadcrumbSeparator>
+                    )}
+                  </BreadcrumbItem>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </header>
