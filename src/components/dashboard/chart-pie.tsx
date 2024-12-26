@@ -18,6 +18,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { api } from "@/lib/utils/api";
+import { useParams } from "next/navigation";
 
 const chartData = [
   { mealType: "Standard", orders: 450, fill: "var(--color-standard)" },
@@ -54,8 +56,20 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartPie() {
-  const totalOrders = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.orders, 0);
+  const { team } = useParams();
+  const [chartData, setChartData] = React.useState<{
+    data?: any;
+    topTwo?: any;
+    totalCount?: number;
+  }>({});
+  React.useLayoutEffect(() => {
+    (async () => {
+      let response = await api(
+        "GET",
+        `/companies/analytics/meal-type-distribution/${team}`,
+      );
+      setChartData(response);
+    })();
   }, []);
 
   return (
@@ -75,7 +89,7 @@ export function ChartPie() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
+              data={chartData.data}
               dataKey="orders"
               nameKey="mealType"
               innerRadius={60}
@@ -96,7 +110,7 @@ export function ChartPie() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalOrders.toLocaleString()}
+                          {chartData?.totalCount?.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -115,10 +129,12 @@ export function ChartPie() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Vegetarian and Vegan options trending up{" "}
-          <TrendingUp className="h-4 w-4" />
-        </div>
+        {chartData?.topTwo?.length > 0 && (
+          <div className="flex items-center gap-2 font-medium leading-none">
+            {chartData?.topTwo[0]} and {chartData?.topTwo[1]} options up
+            <TrendingUp className="h-4 w-4" />
+          </div>
+        )}
         <div className="leading-none text-muted-foreground">
           Standard meals still most popular choice
         </div>

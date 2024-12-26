@@ -17,41 +17,61 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { api } from "@/lib/utils/api";
+import { useParams } from "next/navigation";
 
+/**
+ * Example data for monthly order cost vs. company monthly order cost.
+ * You’d ultimately pull these values from MongoDB—likely by aggregating
+ * your `getPayrollByDate` or a similar function—for each month.
+ */
 const chartData = [
-  { month: "January", lunch: 3200, dinner: 2100 },
-  { month: "February", lunch: 3500, dinner: 2300 },
-  { month: "March", lunch: 3800, dinner: 2500 },
-  { month: "April", lunch: 3600, dinner: 2400 },
-  { month: "May", lunch: 4000, dinner: 2700 },
-  { month: "June", lunch: 4200, dinner: 2900 },
+  { month: "January", monthlyOrderCost: 5500, companyMonthlyOrderCost: 2200 },
+  { month: "February", monthlyOrderCost: 5200, companyMonthlyOrderCost: 2000 },
+  { month: "March", monthlyOrderCost: 5800, companyMonthlyOrderCost: 2500 },
+  { month: "April", monthlyOrderCost: 5100, companyMonthlyOrderCost: 2100 },
+  { month: "May", monthlyOrderCost: 5900, companyMonthlyOrderCost: 2700 },
+  { month: "June", monthlyOrderCost: 6200, companyMonthlyOrderCost: 3000 },
 ];
 
+/**
+ * Updated chart config with new keys.
+ */
 const chartConfig = {
-  lunch: {
-    label: "Lunch",
+  monthlyOrderCost: {
+    label: "Total",
     color: "hsl(var(--chart-1))",
   },
-  dinner: {
-    label: "Dinner",
+  companyMonthlyOrderCost: {
+    label: "Company",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
 export function ChartArea() {
+  const { team } = useParams();
+  const [data, setData] = useState(chartData);
+  useLayoutEffect(() => {
+    (async () => {
+      let response = await api("GET", `/companies/analytics/area-cost/${team}`);
+      setData(response?.data);
+    })();
+  }, []);
+
   return (
     <Card className="xl:col-span-2">
       <CardHeader>
-        <CardTitle>Meal Orders Over Time</CardTitle>
+        <CardTitle>Monthly Costs Over Time</CardTitle>
         <CardDescription>
-          Showing total meal orders for the last 6 months
+          Tracking total monthly order cost vs. company’s share
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-52 w-full">
           <AreaChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{
               left: 12,
               right: 12,
@@ -67,22 +87,22 @@ export function ChartArea() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={<ChartTooltipContent indicator="dot" className="w-48" />}
             />
             <Area
-              dataKey="dinner"
-              type="natural"
-              fill="var(--color-dinner)"
+              dataKey="companyMonthlyOrderCost"
+              type="monotoneX"
+              fill="var(--color-companyMonthlyOrderCost)"
               fillOpacity={0.4}
-              stroke="var(--color-dinner)"
+              stroke="var(--color-companyMonthlyOrderCost)"
               stackId="a"
             />
             <Area
-              dataKey="lunch"
-              type="natural"
-              fill="var(--color-lunch)"
+              dataKey="monthlyOrderCost"
+              type="monotoneX"
+              fill="var(--color-monthlyOrderCost)"
               fillOpacity={0.4}
-              stroke="var(--color-lunch)"
+              stroke="var(--color-monthlyOrderCost)"
               stackId="a"
             />
           </AreaChart>
