@@ -32,7 +32,6 @@ export const createUser = async (jwt: string, userData: any) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwt}`,
-        "x-tenant-id": "agamim",
       },
     },
   );

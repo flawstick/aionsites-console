@@ -318,7 +318,6 @@ export function UserTable() {
                           onClick={() =>
                             setCurrentPage((prev) => Math.max(prev - 1, 1))
                           }
-                          disabled={currentPage === 1}
                         />
                       </PaginationItem>
 
@@ -343,7 +342,6 @@ export function UserTable() {
                               Math.min(prev + 1, totalPages),
                             )
                           }
-                          disabled={currentPage === totalPages}
                         />
                       </PaginationItem>
                     </PaginationContent>

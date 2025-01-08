@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import useOrderStore, { Order } from "@/lib/store/useOrderStore";
+import useOrderStore from "@/lib/store/useOrderStore";
+import { IOrder as Order } from "@/lib/types";
 import {
   Card,
   CardContent,

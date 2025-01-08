@@ -1,4 +1,4 @@
-import { Order } from "@/lib/store/useOrderStore";
+import { IOrder as Order } from "@/lib/types";
 import {
   Document,
   Packer,
@@ -67,7 +67,7 @@ export const exportAsDOCX = (orders: Order[], fromDate: Date, toDate: Date) => {
             new TableRow({
               children: [
                 order._id,
-                order.user.name,
+                order.customerName,
                 createSummarizedOrderDetails(order),
                 order.totalPrice.toString(),
                 order.status,
@@ -76,7 +76,7 @@ export const exportAsDOCX = (orders: Order[], fromDate: Date, toDate: Date) => {
               ].map(
                 (cell) =>
                   new TableCell({
-                    children: [new Paragraph(cell.toString())],
+                    children: [new Paragraph(cell?.toString() as string)],
                     width: { size: 20, type: WidthType.PERCENTAGE },
                   }),
               ),
@@ -117,7 +117,7 @@ export const exportAsXLSX = (orders: Order[], fromDate: Date, toDate: Date) => {
   const worksheet = XLSX.utils.json_to_sheet(
     filteredOrders.map((order: Order) => ({
       [hebrewHeaders["Order ID"]]: order._id,
-      [hebrewHeaders["User Name"]]: order.user.name,
+      [hebrewHeaders["User Name"]]: order.customerName,
       [hebrewHeaders["Items"]]: createSummarizedOrderDetails(order),
       [hebrewHeaders["Total Price"]]: order.totalPrice,
       [hebrewHeaders["Status"]]: order.status,

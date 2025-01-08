@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Order } from "@/lib/store/useOrderStore";
+import { IOrder as Order } from "@/lib/types";
 import {
   ClockIcon,
   CircleCheckIcon,
@@ -102,22 +102,22 @@ export function OrderUserHoverCard({ order }: OrderUserHoverCardProps) {
     <HoverCard>
       <HoverCardTrigger asChild>
         <div className="text-sm font-medium cursor-pointer hover:underline underline-offset-4">
-          {order.user.name}
+          {order?.customerName}
         </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-70">
         <div className="flex justify-between space-x-4">
           <Avatar>
-            <AvatarImage src={order.user?.profile?.profilePicture} />
-            <AvatarFallback>{order.user?.name[0]}</AvatarFallback>
+            <AvatarImage src={order?.customerProfile?.profilePicture} />
+            <AvatarFallback>{order?.customerName[0]}</AvatarFallback>
           </Avatar>
           <div className="space-y-1">
-            <h4 className="text-sm font-semibold">{order.user.name}</h4>
-            <p className="text-sm">{order.user?.profile?.bio}</p>
+            <h4 className="text-sm font-semibold">{order?.customerName}</h4>
+            <p className="text-sm">{order?.customerProfile?.bio}</p>
             <div className="flex items-center pt-2">
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
               <span className="text-xs text-muted-foreground">
-                Joined {formatDate(order.user?.createdAt)}
+                Joined {formatDate(order.createdAt)}
               </span>
             </div>
           </div>

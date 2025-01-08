@@ -63,6 +63,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "../theme-toggle";
+import { UserNav } from "../user-nav";
 
 const data = {
   user: {

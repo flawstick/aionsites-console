@@ -84,6 +84,7 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     set({ companies });
   },
   setSelectedCompany: async (companyId: string) => {
+    console.log("setSelectedCompany");
     try {
       const token: string = localStorage.getItem("jwt") as string;
       const company = await getCompanyById(token, companyId);

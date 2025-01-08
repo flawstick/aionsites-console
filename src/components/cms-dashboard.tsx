@@ -345,7 +345,7 @@ export function CMSDashboard() {
               >
                 {orders.length > 0 ? (
                   <div className="flex flex-col gap-2">
-                    {orders.map((order) =>
+                    {orders.map((order: any) =>
                       order.items.map(
                         (restaurantItem: any) =>
                           restaurantItem?.items?.map(

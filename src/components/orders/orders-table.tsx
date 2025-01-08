@@ -306,7 +306,6 @@ const OrderTable: React.FC<OrderTableProps> = ({
                         await handlePageChange(currentPage + 1);
                       }
                     }}
-                    disabled={currentPage === totalPotentialPages}
                   />
                 </PaginationItem>
               </PaginationContent>

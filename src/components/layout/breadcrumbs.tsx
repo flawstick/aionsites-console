@@ -7,10 +7,9 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export function Breadcrumbs() {
-  const { breadcrumbs } = useSidebar();
+  let breadcrumbs: any[] = [];
 
   return (
     <Breadcrumb>

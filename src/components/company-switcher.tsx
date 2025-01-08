@@ -46,7 +46,6 @@ export function CompanySwitcher({ className }: CompanySwitcherProps) {
     useCompanyStore();
 
   React.useEffect(() => {
-    console.log("session", session);
     if (session) fetchCompanies();
   }, [session]);
 
