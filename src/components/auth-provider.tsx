@@ -1,22 +1,21 @@
 "use client";
 
 import { ReactNode, useCallback, useEffect } from "react";
-import useAuth from "@/lib/hooks/useAuth";
 import { SessionProvider } from "next-auth/react";
-import Loading from "@/components/loading";
 import { useParams, usePathname } from "next/navigation";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
-import { useRouter, useSearchParams } from "next/navigation";
-import { getAllCompanies } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { status } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   const changeTeam = useCallback(async (newTeamId: string) => {
     // Use regex to replace the dynamic [team] part of the path
-    const updatedPath = pathname.replace(/^\/[^/]+/, `/${newTeamId}`);
+    const updatedPath =
+      pathname === "/" || pathname === ""
+        ? `/${newTeamId}`
+        : pathname.replace(/^\/[^/]+/, `/${newTeamId}`);
 
     router.replace(updatedPath); // Navigate to the updated path
   }, []);
@@ -30,12 +29,14 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
       const companies = await fetchCompanies();
       companies?.map((company: any) => {
         if (company.tenantId === team) {
-          setSelectedCompany(company as any);
+          setSelectedCompany(company._id);
           changeTeam(company.tenantId);
           return;
         }
       });
-      if (!selectedCompany) {
+
+      if (!selectedCompany && companies.length > 0) {
+        setSelectedCompany(companies[0]._id);
         changeTeam(companies[0].tenantId);
       }
     })();
@@ -49,10 +50,6 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
       changeTeam(selectedCompany?.tenantId as string);
     }
   }, [selectedCompany]);
-
-  if (status === "loading") {
-    return <Loading />;
-  }
 
   return <>{children}</>;
 };

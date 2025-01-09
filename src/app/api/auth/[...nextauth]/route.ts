@@ -77,7 +77,7 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }: any) {
-      return baseUrl;
+      return baseUrl + "/login";
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

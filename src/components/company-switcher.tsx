@@ -39,15 +39,9 @@ type CompanySwitcherProps = React.ComponentPropsWithoutRef<
 >;
 
 export function CompanySwitcher({ className }: CompanySwitcherProps) {
-  const { session }: any = useAuth();
   const [open, setOpen] = React.useState(false);
   const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
-  const { companies, setSelectedCompany, selectedCompany, fetchCompanies } =
-    useCompanyStore();
-
-  React.useEffect(() => {
-    if (session) fetchCompanies();
-  }, [session]);
+  const { companies, selectedCompany, setSelectedCompany } = useCompanyStore();
 
   return (
     <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>

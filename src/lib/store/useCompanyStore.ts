@@ -45,9 +45,6 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
       const token: string = localStorage.getItem("jwt") as string;
       const companies = await getAllCompanies(token);
       set({ companies });
-      if (companies.length > 0 && !get().selectedCompany) {
-        set({ selectedCompany: companies[0] });
-      }
       return companies;
     } catch (error) {
       console.error("Error fetching companies:", error);
@@ -84,7 +81,6 @@ export const useCompanyStore = create<CompanyState>((set, get) => ({
     set({ companies });
   },
   setSelectedCompany: async (companyId: string) => {
-    console.log("setSelectedCompany");
     try {
       const token: string = localStorage.getItem("jwt") as string;
       const company = await getCompanyById(token, companyId);
