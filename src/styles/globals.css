@@ -92,3 +92,38 @@
 .ltr {
   direction: ltr;
 }
+
+.bg-gradient-animated {
+  background: linear-gradient(-45deg, #3490dc, #6574cd, #9561e2, #f66d9b);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Add a subtle floating animation to the card */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.card-float {
+  animation: float 6s ease-in-out infinite;
+}

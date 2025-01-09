@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { useParams, usePathname } from "next/navigation";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 import { useRouter } from "next/navigation";
+import useAuth from "@/lib/hooks/useAuth";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const router = useRouter();

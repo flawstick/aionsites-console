@@ -11,7 +11,7 @@ const useAuth = () => {
     if (!session) router.replace("/login"); // Redirect to login if not authenticated
 
     // @ts-ignore
-    if (session?.status === 401) router.replace("/"); // Redirect to login if session is invalid
+    if (session?.status === 401) router.replace("/login"); // Redirect to login if session is invalid
   }, [session as any, status, router]);
 
   useEffect(() => {
