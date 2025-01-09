@@ -6,6 +6,7 @@ import { useParams, usePathname } from "next/navigation";
 import { useCompanyStore } from "@/lib/store/useCompanyStore";
 import { useRouter } from "next/navigation";
 import useAuth from "@/lib/hooks/useAuth";
+import { boolean } from "zod";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
@@ -28,15 +29,17 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     (async () => {
       const companies = await fetchCompanies();
-      companies?.map((company: any) => {
+      let found: boolean = false;
+      await companies?.map((company: any) => {
         if (company.tenantId === team) {
+          found = true;
           setSelectedCompany(company._id);
           changeTeam(company.tenantId);
           return;
         }
       });
 
-      if (!selectedCompany && companies.length > 0) {
+      if (!found && companies.length > 0) {
         setSelectedCompany(companies[0]._id);
         changeTeam(companies[0].tenantId);
       }
